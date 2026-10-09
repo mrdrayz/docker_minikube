@@ -1,7 +1,7 @@
-import { request } from "./client"
+import { API_BASE_URL, request } from "./client"
 import type { Project, ProjectInput, ProjectWithStats } from "./types"
 
-const BASE_URL = "/api/projects"
+const BASE_URL = `${API_BASE_URL}/projects`
 
 export const projectsApi = {
 	list: () => request<ProjectWithStats[]>("GET", BASE_URL),

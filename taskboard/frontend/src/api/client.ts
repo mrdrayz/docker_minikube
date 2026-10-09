@@ -1,5 +1,7 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE"
 
+export const API_BASE_URL = "/api/v1"
+
 const NO_CONNECTION = "Нет связи с сервером. Проверьте, что бэкенд запущен."
 
 function readErrorMessage(data: unknown): string | undefined {

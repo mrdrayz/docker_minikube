@@ -1,6 +1,7 @@
 import type { Pool } from "pg"
 import { loadConfig } from "../config"
 import { createLogger } from "../lib/logger"
+import { describeError } from "../lib/safeError"
 import { listMigrationFiles } from "./migrations"
 import { createPool } from "./pool"
 
@@ -39,7 +40,7 @@ async function main(): Promise<void> {
 
 				logger.info({ pending }, "Ждём применения миграций")
 			} catch (err) {
-				const reason = err instanceof Error ? err.message : String(err)
+				const reason = describeError(err)
 
 				logger.info({ reason }, "Ждём базу данных и таблицу миграций")
 			}

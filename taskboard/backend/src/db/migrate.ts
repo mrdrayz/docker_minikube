@@ -3,6 +3,7 @@ import path from "node:path"
 import type { PoolClient } from "pg"
 import { loadConfig } from "../config"
 import { createLogger, type Logger } from "../lib/logger"
+import { describeError } from "../lib/safeError"
 import { listMigrationFiles, MIGRATIONS_DIR } from "./migrations"
 import { createPool } from "./pool"
 
@@ -45,7 +46,7 @@ async function applyMigration(
 	} catch (err) {
 		await client.query("ROLLBACK")
 		
-    const reason = err instanceof Error ? err.message : String(err)
+    const reason = describeError(err)
 		
     throw new Error(`Миграция ${file} не применена: ${reason}`)
 	}

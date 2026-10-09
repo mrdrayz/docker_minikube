@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http"
 import { pinoHttp } from "pino-http"
 import type { Logger } from "../lib/logger"
+import { toSafeError } from "../lib/safeError"
 
 function getLogLevel(_req: IncomingMessage, res: ServerResponse, err?: Error) {
 	if (err || res.statusCode >= 500) return "error"
@@ -19,6 +20,7 @@ export function createRequestLogger(
 		autoLogging: { ignore: (req) => ignoredPaths.includes(req.url ?? "") },
 		customLogLevel: getLogLevel,
 		serializers: {
+			err: toSafeError,
 			req: (req: { id: unknown; method: string; url: string }) => ({
 				id: req.id,
 				method: req.method,

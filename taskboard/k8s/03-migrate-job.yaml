@@ -18,7 +18,7 @@ spec:
       restartPolicy: Never
       initContainers:
         - name: wait-for-postgres
-          image: postgres:16-alpine
+          image: postgres:16.15-alpine3.24
           command:
             - sh
             - -c
@@ -31,6 +31,10 @@ spec:
           image: taskboard-backend:1.0.0
           imagePullPolicy: Never
           command: ["node", "dist/db/migrate.js"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
           envFrom:
             - configMapRef:
                 name: backend-config

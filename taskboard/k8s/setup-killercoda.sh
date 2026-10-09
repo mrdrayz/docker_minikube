@@ -14,9 +14,13 @@ step() {
 
 pull_base_image() {
 	local image="$1"
+	local mirror_path="$image"
 
-	if docker pull "${MIRROR}/library/${image}"; then
-		docker tag "${MIRROR}/library/${image}" "$image"
+	if [[ "$image" != */* ]]; then
+		mirror_path="library/${image}"
+	fi
+	if docker pull "${MIRROR}/${mirror_path}"; then
+		docker tag "${MIRROR}/${mirror_path}" "$image"
 	else
 		docker pull "$image"
 	fi
@@ -41,8 +45,9 @@ echo "kubectl: $(kubectl version --client -o json | awk -F'"' '/gitVersion/ && !
 echo "minikube: $(minikube version --short)"
 
 step "Фронтенд: сборка на машине (docker build), до запуска кластера — так меньше нагрузка на память"
-pull_base_image node:22-alpine
-pull_base_image nginx:1.29-alpine
+while read -r image; do
+	pull_base_image "$image"
+done < <(awk '/^FROM/ {print $2}' "$PROJECT_DIR/frontend/Dockerfile" | sort -u)
 docker build -t "$FRONTEND_IMAGE" "$PROJECT_DIR/frontend"
 
 step "Запуск minikube (среда выполнения контейнеров: docker)"

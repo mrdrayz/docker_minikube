@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:16.15-alpine3.24
     environment:
       POSTGRES_DB: ${DB_NAME:-taskboard}
       POSTGRES_USER: ${DB_USER:-taskboard}
@@ -34,12 +34,12 @@ services:
     build: ./backend
     environment:
       <<: *backend-env
-      PORT: 3000
+      PORT: ${BACKEND_PORT:-3000}
     depends_on:
       migrate:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/readyz || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:$${PORT}/readyz || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -47,10 +47,15 @@ services:
   frontend:
     build: ./frontend
     environment:
-      FRONTEND_PORT: 8080
-      BACKEND_URL: http://backend:3000
+      FRONTEND_PORT: ${FRONTEND_PORT:-8080}
+      BACKEND_URL: http://backend:${BACKEND_PORT:-3000}
     ports:
-      - "${FRONTEND_EXTERNAL_PORT:-8080}:8080"
+      - "${FRONTEND_EXTERNAL_PORT:-8080}:${FRONTEND_PORT:-8080}"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:$${FRONTEND_PORT}/healthz || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     depends_on:
       backend:
         condition: service_healthy

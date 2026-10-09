@@ -44,6 +44,10 @@ spec:
           image: taskboard-backend:1.0.0
           imagePullPolicy: Never
           command: ["node", "dist/db/wait-for-migrations.js"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
           envFrom:
             - configMapRef:
                 name: backend-config
@@ -56,6 +60,9 @@ spec:
           ports:
             - name: http
               containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
           envFrom:
             - configMapRef:
                 name: backend-config
@@ -72,6 +79,10 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
           lifecycle:
             preStop:
               exec:

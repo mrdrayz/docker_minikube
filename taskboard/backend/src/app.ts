@@ -16,6 +16,8 @@ import {
 } from "./modules/projects"
 import { createTasksRouter, type TasksRepository } from "./modules/tasks"
 
+const API_PREFIX = "/api/v1"
+
 export type AppDependencies = {
 	logger: Logger
 	projectsRepository: ProjectsRepository
@@ -31,8 +33,11 @@ export function createApp(deps: AppDependencies): Express {
 	app.use(express.json({ limit: "100kb" }))
 
 	app.use(createHealthRouter(deps.health))
-	app.use("/api/projects", createProjectsRouter(deps.projectsRepository))
-	app.use("/api/tasks", createTasksRouter(deps.tasksRepository))
+	app.use(
+		`${API_PREFIX}/projects`,
+		createProjectsRouter(deps.projectsRepository),
+	)
+	app.use(`${API_PREFIX}/tasks`, createTasksRouter(deps.tasksRepository))
 
 	app.use(notFoundHandler)
 	app.use(errorHandler)
