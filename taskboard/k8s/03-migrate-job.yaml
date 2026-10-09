@@ -42,7 +42,7 @@ spec:
                 name: taskboard-db
           resources:
             requests:
-              cpu: 50m
+              cpu: 20m
               memory: 64Mi
             limits:
               memory: 256Mi
