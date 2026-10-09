@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+trap 'printf "\n\033[1;31mОшибка в строке %s: %s\033[0m\n" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
 NAMESPACE="taskboard"
 BACKEND_IMAGE="taskboard-backend:1.0.0"
@@ -36,16 +37,21 @@ if ! command -v minikube > /dev/null; then
 	curl -fsSLo /usr/local/bin/minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 	chmod +x /usr/local/bin/minikube
 fi
-kubectl version --client | head -1
-minikube version | head -1
+echo "kubectl: $(kubectl version --client -o json | awk -F'"' '/gitVersion/ && !found {print $4; found = 1}')"
+echo "minikube: $(minikube version --short)"
+
+step "Фронтенд: сборка на машине (docker build), до запуска кластера — так меньше нагрузка на память"
+pull_base_image node:22-alpine
+pull_base_image nginx:1.29-alpine
+docker build -t "$FRONTEND_IMAGE" "$PROJECT_DIR/frontend"
 
 step "Запуск minikube (среда выполнения контейнеров: docker)"
-MINIKUBE_MEM=$((MEM_MB - 700))
+MINIKUBE_MEM=$((MEM_MB - 400))
 if [ "$MINIKUBE_MEM" -gt 4096 ]; then
 	MINIKUBE_MEM=4096
 fi
-if [ "$MINIKUBE_MEM" -lt 1800 ]; then
-	MINIKUBE_MEM=1800
+if [ "$MINIKUBE_MEM" -lt 1200 ]; then
+	MINIKUBE_MEM=1200
 fi
 START_ARGS=(
 	--driver=docker
@@ -59,6 +65,7 @@ if [ "$CPUS" -lt 2 ]; then
 else
 	START_ARGS+=(--cpus=2)
 fi
+echo "minikube start ${START_ARGS[*]}"
 if minikube status > /dev/null 2>&1; then
 	echo "minikube уже запущен"
 else
@@ -69,12 +76,9 @@ step "Бэкенд: сборка внутри minikube (eval \$(minikube docker-
 eval "$(minikube docker-env)"
 echo "Docker-демон: ${MINIKUBE_ACTIVE_DOCKERD:-не minikube}"
 docker build -t "$BACKEND_IMAGE" "$PROJECT_DIR/backend"
-
-step "Фронтенд: сборка на машине и загрузка в minikube (docker build + minikube image load)"
 eval "$(minikube docker-env --unset)"
-pull_base_image node:22-alpine
-pull_base_image nginx:1.29-alpine
-docker build -t "$FRONTEND_IMAGE" "$PROJECT_DIR/frontend"
+
+step "Фронтенд: загрузка образа в minikube (minikube image load)"
 minikube image load "$FRONTEND_IMAGE"
 
 step "Образы в minikube"
