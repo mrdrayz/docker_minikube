@@ -1,0 +1,2 @@
+export const PROJECT_NAME_MAX = 100
+export const PROJECT_DESCRIPTION_MAX = 500

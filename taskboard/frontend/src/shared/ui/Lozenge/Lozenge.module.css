@@ -1,0 +1,38 @@
+.lozenge {
+	display: inline-flex;
+	align-items: center;
+	max-width: 100%;
+	padding: 1px 6px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 16px;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	white-space: nowrap;
+}
+
+.neutral {
+	background: var(--color-neutral-subtle);
+	color: var(--color-text-subtle);
+}
+
+.primary {
+	background: var(--color-primary-subtle);
+	color: var(--color-primary-text);
+}
+
+.success {
+	background: var(--color-success-subtle);
+	color: var(--color-success-text);
+}
+
+.warning {
+	background: var(--color-warning-subtle);
+	color: var(--color-warning-text);
+}
+
+.danger {
+	background: var(--color-danger-subtle);
+	color: var(--color-danger-text);
+}

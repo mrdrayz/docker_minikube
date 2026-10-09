@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-taskboard}
+      POSTGRES_USER: ${DB_USER:-taskboard}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-taskboard}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "${DB_EXTERNAL_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: ./backend
+    command: ["node", "dist/db/migrate.js"]
+    environment: &backend-env
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-taskboard}
+      DB_USER: ${DB_USER:-taskboard}
+      DB_PASSWORD: ${DB_PASSWORD:-taskboard}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build: ./backend
+    environment:
+      <<: *backend-env
+      PORT: 3000
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/readyz || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  frontend:
+    build: ./frontend
+    environment:
+      FRONTEND_PORT: 8080
+      BACKEND_URL: http://backend:3000
+    ports:
+      - "${FRONTEND_EXTERNAL_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  db-data:

@@ -1,0 +1,21 @@
+.banner {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding: 10px 12px 10px 16px;
+	border-left: 4px solid var(--color-danger);
+	border-radius: var(--radius-sm);
+	background: var(--color-danger-subtle);
+	color: var(--color-danger-text);
+}
+
+.text {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.close {
+	flex: 0 0 auto;
+}

@@ -1,0 +1,29 @@
+.wrapper {
+	display: grid;
+	justify-items: start;
+	gap: 2px;
+	min-width: 0;
+}
+
+.text {
+	max-width: 100%;
+	white-space: pre-line;
+	overflow-wrap: anywhere;
+}
+
+.clamped {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.wrapper .toggle {
+	padding-left: 0;
+	padding-right: 0;
+	color: var(--color-primary-text);
+}
+
+.wrapper .toggle:hover:not(:disabled) {
+	background: transparent;
+	text-decoration: underline;
+}

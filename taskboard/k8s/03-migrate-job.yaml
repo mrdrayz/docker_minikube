@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate
+  namespace: taskboard
+  labels:
+    app: migrate
+    app.kubernetes.io/part-of: taskboard
+spec:
+  backoffLimit: 4
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: migrate
+        app.kubernetes.io/part-of: taskboard
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:16-alpine
+          command:
+            - sh
+            - -c
+            - until pg_isready -h "$DB_HOST" -p "$DB_PORT"; do echo "Ждём PostgreSQL..."; sleep 2; done
+          envFrom:
+            - configMapRef:
+                name: backend-config
+      containers:
+        - name: migrate
+          image: taskboard-backend:1.0.0
+          imagePullPolicy: Never
+          command: ["node", "dist/db/migrate.js"]
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: taskboard-db
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi

@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: taskboard
+  labels:
+    app: backend
+    app.kubernetes.io/part-of: taskboard
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: taskboard
+  labels:
+    app: backend
+    app.kubernetes.io/part-of: taskboard
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        app.kubernetes.io/part-of: taskboard
+    spec:
+      terminationGracePeriodSeconds: 30
+      initContainers:
+        - name: wait-for-migrations
+          image: taskboard-backend:1.0.0
+          imagePullPolicy: Never
+          command: ["node", "dist/db/wait-for-migrations.js"]
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: taskboard-db
+      containers:
+        - name: backend
+          image: taskboard-backend:1.0.0
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: taskboard-db
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi

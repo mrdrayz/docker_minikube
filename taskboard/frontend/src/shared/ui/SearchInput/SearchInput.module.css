@@ -1,0 +1,46 @@
+.container {
+	position: relative;
+	display: flex;
+	align-items: center;
+	min-width: 0;
+}
+
+.icon {
+	position: absolute;
+	left: 9px;
+	color: var(--color-text-subtle);
+	pointer-events: none;
+}
+
+.input {
+	height: 32px;
+	padding: 0 30px 0 30px;
+	background: var(--color-input-bg);
+}
+
+.input::-webkit-search-cancel-button {
+	appearance: none;
+}
+
+.input:focus {
+	background: var(--color-surface);
+}
+
+.clear {
+	position: absolute;
+	right: 4px;
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	border: none;
+	border-radius: var(--radius-sm);
+	background: transparent;
+	color: var(--color-text-subtle);
+	cursor: pointer;
+}
+
+.clear:hover {
+	background: var(--color-neutral-subtle);
+	color: var(--color-text);
+}

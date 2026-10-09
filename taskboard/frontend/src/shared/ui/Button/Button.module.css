@@ -1,0 +1,82 @@
+.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+	font-weight: 500;
+	line-height: 20px;
+	white-space: nowrap;
+	text-decoration: none;
+	cursor: pointer;
+	transition:
+		background-color 0.1s ease,
+		color 0.1s ease;
+}
+
+.button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.md {
+	min-height: 32px;
+	padding: 5px 12px;
+}
+
+.sm {
+	min-height: 24px;
+	padding: 1px 8px;
+	font-size: 13px;
+}
+
+.primary {
+	background: var(--color-primary);
+	color: #fff;
+}
+
+.primary:hover:not(:disabled) {
+	background: var(--color-primary-hover);
+}
+
+.primary:active:not(:disabled) {
+	background: var(--color-primary-pressed);
+}
+
+.secondary {
+	background: var(--color-neutral-subtle);
+	color: var(--color-text);
+}
+
+.secondary:hover:not(:disabled) {
+	background: var(--color-neutral-hover);
+}
+
+.subtle {
+	background: transparent;
+	color: var(--color-text-subtle);
+}
+
+.subtle:hover:not(:disabled) {
+	background: var(--color-neutral-subtle);
+	color: var(--color-text);
+}
+
+.danger {
+	background: var(--color-danger);
+	color: #fff;
+}
+
+.danger:hover:not(:disabled) {
+	background: var(--color-danger-hover);
+}
+
+.dangerSubtle {
+	background: transparent;
+	color: var(--color-danger-text);
+}
+
+.dangerSubtle:hover:not(:disabled) {
+	background: var(--color-danger-subtle);
+}

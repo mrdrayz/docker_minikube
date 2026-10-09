@@ -1,0 +1,23 @@
+.field {
+	display: grid;
+	gap: 4px;
+	min-width: 0;
+}
+
+.label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--color-text-subtle);
+}
+
+.required {
+	margin-left: 2px;
+	color: var(--color-danger-text);
+}
+
+.hint {
+	font-size: 12px;
+	color: var(--color-text-subtle);
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
